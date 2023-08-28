@@ -16,48 +16,78 @@ class DownloadHistory
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Image $image_id = null;
+    private ?Image $image = null;
 
-    #[ORM\Column(type: Types::ARRAY)]
-    private array $status = [];
+    #[ORM\Column(length: 255)]
+    private ?string $status = null;
+
+    #[ORM\Column]
+    private ?int $retries = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $log_message = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $error_message = null;
 
-    #[ORM\Column]
-    private ?int $n_retries = null;
-
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $last_retry_at = null;
+    private ?\DateTimeInterface $started_at = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $downloaded_at = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $downloaded_at = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $restarted_at = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getImageId(): ?Image
+    public function getImage(): ?Image
     {
-        return $this->image_id;
+        return $this->image;
     }
 
-    public function setImageId(Image $image_id): static
+    public function setImage(Image $image): static
     {
-        $this->image_id = $image_id;
+        $this->image = $image;
 
         return $this;
     }
 
-    public function getStatus(): array
+    public function getStatus(): ?string
     {
         return $this->status;
     }
 
-    public function setStatus(array $status): static
+    public function setStatus(string $status): static
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getRetries(): ?int
+    {
+        return $this->retries;
+    }
+
+    public function setRetries(int $retries): static
+    {
+        $this->retries = $retries;
+
+        return $this;
+    }
+
+    public function getLogMessage(): ?string
+    {
+        return $this->log_message;
+    }
+
+    public function setLogMessage(string $log_message): static
+    {
+        $this->log_message = $log_message;
 
         return $this;
     }
@@ -74,38 +104,38 @@ class DownloadHistory
         return $this;
     }
 
-    public function getNRetries(): ?int
+    public function getStartedAt(): ?\DateTimeInterface
     {
-        return $this->n_retries;
+        return $this->started_at;
     }
 
-    public function setNRetries(int $n_retries): static
+    public function setStartedAt(\DateTimeInterface $started_at): static
     {
-        $this->n_retries = $n_retries;
+        $this->started_at = $started_at;
 
         return $this;
     }
 
-    public function getLastRetryAt(): ?\DateTimeInterface
-    {
-        return $this->last_retry_at;
-    }
-
-    public function setLastRetryAt(\DateTimeInterface $last_retry_at): static
-    {
-        $this->last_retry_at = $last_retry_at;
-
-        return $this;
-    }
-
-    public function getDownloadedAt(): ?\DateTimeImmutable
+    public function getDownloadedAt(): ?\DateTimeInterface
     {
         return $this->downloaded_at;
     }
 
-    public function setDownloadedAt(?\DateTimeImmutable $downloaded_at): static
+    public function setDownloadedAt(?\DateTimeInterface $downloaded_at): static
     {
         $this->downloaded_at = $downloaded_at;
+
+        return $this;
+    }
+
+    public function getRestartedAt(): ?\DateTimeInterface
+    {
+        return $this->restarted_at;
+    }
+
+    public function setRestartedAt(?\DateTimeInterface $restarted_at): static
+    {
+        $this->restarted_at = $restarted_at;
 
         return $this;
     }

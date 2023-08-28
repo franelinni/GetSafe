@@ -15,26 +15,40 @@ class FileService
 
     protected const DEST_DIR = 'data/storage';
 
+    protected const SOURCE = 'file';
+
     protected array $allowedExtensions = [
         'txt', 'csv'//, 'rtf'
     ];
+
+    protected array $fileContent;
 
     public function __construct(protected array $fileProcessors, protected EntityManagerInterface $entityManager)
     {
        
     }
 
-    public function processFile(\SplFileInfo $inputFile, string $destDir)
+    public function processFile(\SplFileInfo $inputFile): InputFile
     {
-        $this->currentFile = $inputFile;
-        $fileProcessor = $this->getFileProcessor();
-        $fileProcessorContext = new FileProcessorContext($fileProcessor);
-        
-        $data = $fileProcessorContext->processFile($inputFile);
+       try {
+            $this->currentFile = $inputFile;
+            $fileProcessor = $this->getFileProcessor();
+            $fileProcessorContext = new FileProcessorContext($fileProcessor);
+            
+            $this->fileContent = $fileProcessorContext->processFile($inputFile);
 
-        $this->saveFileMeta($inputFile, $data['count']);
+            $inputFile = $this->saveFileMeta($inputFile, $this->fileContent['count']);
+            
+            return $inputFile;
+            
+        } catch(\Exception $e) {
+            throw new \Exception($e);
+        }
+    }
 
-        return $data;
+    public function getFileContents(): array | null 
+    {
+        return $this->fileContent ?: null;
     }
 
     private function getFileExtension(): String|null
@@ -59,15 +73,26 @@ class FileService
         return new ($processorName)();
     }
 
-    protected function saveFileMeta(\SplFileInfo $splFileInfo, int $lines, string $desDir = self::DEST_DIR)
+    protected function saveFileMeta(\SplFileInfo $splFileInfo, int $lines, string $desDir = self::DEST_DIR): InputFile
     {
-        $inputFile = new InputFile();
-        $inputFile->setName($splFileInfo->getFilename())
-            ->setSize($splFileInfo->getSize())
-            ->setNLines($lines)
-            ->setDestinationFolder($desDir)
-            ->setCreatedAt(new \DateTime("now"));
+        $inputFile = $this->entityManager->getRepository(InputFile::class)
+            ->findOneBy(['filename' => $splFileInfo->getFilename()]);
+        
+        if (!$inputFile) {
+            $inputFile = new InputFile();
+            $inputFile->setFilename($splFileInfo->getFilename())
+                ->setSize($splFileInfo->getSize())
+                ->setSource(SELF::SOURCE)
+                ->setNLines($lines)
+                ->setDestination($desDir)
+                ->setCreatedAt(new DateTime('now'));
+        } else {
+            $inputFile->setUpdatedAt(new DateTime('now'));
+        }
+        
         $this->entityManager->persist($inputFile);
         $this->entityManager->flush();
+
+        return $inputFile;
     }
 }

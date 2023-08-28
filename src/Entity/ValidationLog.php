@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ValidationLogRepository;
+use DateTime;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ValidationLogRepository::class)]
@@ -13,45 +15,35 @@ class ValidationLog
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(inversedBy: 'validationLog', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    private ?InputFile $input_file_id = null;
+    private ?Image $image = null;
 
-    #[ORM\OneToOne(inversedBy: 'log', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Image $image_id = null;
-
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column]
     private ?bool $is_valid = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $error_mesage = null;
+    private ?string $error_message = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $created_at = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $updated_at = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getInputFileId(): ?InputFile
+    public function getImage(): ?Image
     {
-        return $this->input_file_id;
+        return $this->image;
     }
 
-    public function setInputFileId(InputFile $input_file_id): static
+    public function setImage(Image $image): static
     {
-        $this->input_file_id = $input_file_id;
-
-        return $this;
-    }
-
-    public function getImageId(): ?Image
-    {
-        return $this->image_id;
-    }
-
-    public function setImageId(Image $image_id): static
-    {
-        $this->image_id = $image_id;
+        $this->image = $image;
 
         return $this;
     }
@@ -61,21 +53,45 @@ class ValidationLog
         return $this->is_valid;
     }
 
-    public function setIsValid(?bool $is_valid): static
+    public function setIsValid(bool $is_valid): static
     {
         $this->is_valid = $is_valid;
 
         return $this;
     }
 
-    public function getErrorMesage(): ?string
+    public function getErrorMessage(): ?string
     {
-        return $this->error_mesage;
+        return $this->error_message;
     }
 
-    public function setErrorMesage(?string $error_mesage): static
+    public function setErrorMessage(?string $error_message): static
     {
-        $this->error_mesage = $error_mesage;
+        $this->error_message = $error_message;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->created_at;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $created_at = (new DateTime("now"))): static
+    {
+        $this->created_at = $created_at;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updated_at;
+    }
+
+    public function setUpdatedAt(?\DateTimeInterface $updated_at): static
+    {
+        $this->updated_at = $updated_at;
 
         return $this;
     }

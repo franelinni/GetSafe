@@ -22,3 +22,18 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    App\Service\File\FileService:
+        arguments: 
+            $fileProcessors:
+                txt: '@App\Service\File\FileProcessor\TxtFileProcessor'
+                csv: '@App\Service\File\FileProcessor\CsvFileProcessor'
+            #$entityManager: '@Doctrine\ORM\EntityManager'
+
+    App\Service\Image\ImageDownloaderService:
+        arguments:
+            $imageProcessor: '@App\Service\Image\ImageProcessor'
+    
+    App\Service\Image\ImageProcessor:
+        arguments:
+            $fileService: '@App\Service\File\FileService'
+            

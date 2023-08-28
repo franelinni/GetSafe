@@ -3,6 +3,10 @@
 namespace App\Entity;
 
 use App\Repository\ImageRepository;
+use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ImageRepository::class)]
@@ -13,40 +17,29 @@ class Image
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\OneToOne(inversedBy: 'image', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?InputFile $inputFileId = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255)]
     private ?string $url = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\OneToOne(mappedBy: 'image', cascade: ['persist', 'remove'])]
+    private ?ValidationLog $validationLog = null;
+
+    #[ORM\Column]
     private ?int $size = null;
 
-    #[ORM\Column]
-    private ?\DateTimeImmutable $created_at = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $created_at;
 
-    #[ORM\Column]
-    private ?\DateTimeImmutable $update_at = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $updated_at = null;
 
-    #[ORM\OneToOne(mappedBy: 'image_id', cascade: ['persist', 'remove'])]
-    private ?ValidationLog $log = null;
+    public function __construct()
+    {
+        
+    }
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getInputFileId(): ?InputFile
-    {
-        return $this->inputFileId;
-    }
-
-    public function setInputFileId(InputFile $inputFileId): static
-    {
-        $this->inputFileId = $inputFileId;
-
-        return $this;
     }
 
     public function getUrl(): ?string
@@ -54,9 +47,26 @@ class Image
         return $this->url;
     }
 
-    public function setUrl(?string $url): static
+    public function setUrl(string $url): static
     {
         $this->url = $url;
+
+        return $this;
+    }
+
+    public function getValidationLog(): ?ValidationLog
+    {
+        return $this->validationLog;
+    }
+
+    public function setValidationLog(ValidationLog $validationLog): static
+    {
+        // set the owning side of the relation if necessary
+        if ($validationLog->getImage() !== $this) {
+            $validationLog->setImage($this);
+        }
+
+        $this->validationLog = $validationLog;
 
         return $this;
     }
@@ -73,43 +83,26 @@ class Image
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->created_at;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): static
+    public function setCreatedAt(\DateTimeInterface $created_at): static
     {
         $this->created_at = $created_at;
 
         return $this;
     }
 
-    public function getUpdateAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?\DateTimeInterface
     {
-        return $this->update_at;
+        return $this->updated_at;
     }
 
-    public function setUpdateAt(\DateTimeImmutable $update_at): static
+    public function setUpdatedAt(?\DateTimeInterface $updated_at): static
     {
-        $this->update_at = $update_at;
-
-        return $this;
-    }
-
-    public function getLog(): ?ValidationLog
-    {
-        return $this->log;
-    }
-
-    public function setLog(ValidationLog $log): static
-    {
-        // set the owning side of the relation if necessary
-        if ($log->getImageId() !== $this) {
-            $log->setImageId($this);
-        }
-
-        $this->log = $log;
+        $this->updated_at = $updated_at;
 
         return $this;
     }

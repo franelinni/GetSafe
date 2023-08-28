@@ -15,7 +15,10 @@ class InputFile
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    private ?string $filename = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $source = null;
 
     #[ORM\Column(nullable: true)]
     private ?int $size = null;
@@ -24,7 +27,7 @@ class InputFile
     private ?int $n_lines = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $destination_folder = null;
+    private ?string $destination = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
@@ -32,22 +35,31 @@ class InputFile
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updated_at = null;
 
-    #[ORM\OneToOne(mappedBy: 'inputFileId', cascade: ['persist', 'remove'])]
-    private ?Image $image = null;
-
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getFilename(): ?string
     {
-        return $this->name;
+        return $this->filename;
     }
 
-    public function setName(string $name): static
+    public function setFilename(string $filename): static
     {
-        $this->name = $name;
+        $this->filename = $filename;
+
+        return $this;
+    }
+
+    public function getSource(): ?string
+    {
+        return $this->source;
+    }
+
+    public function setSource(string $source): static
+    {
+        $this->source = $source;
 
         return $this;
     }
@@ -76,14 +88,14 @@ class InputFile
         return $this;
     }
 
-    public function getDestinationFolder(): ?string
+    public function getDestination(): ?string
     {
-        return $this->destination_folder;
+        return $this->destination;
     }
 
-    public function setDestinationFolder(string $destination_folder): static
+    public function setDestination(string $destination): static
     {
-        $this->destination_folder = $destination_folder;
+        $this->destination = $destination;
 
         return $this;
     }
@@ -93,9 +105,9 @@ class InputFile
         return $this->created_at;
     }
 
-    public function setCreatedAt(): static
+    public function setCreatedAt(\DateTimeInterface $created_at): static
     {
-        $this->created_at = new \DateTime("now");
+        $this->created_at = $created_at;
 
         return $this;
     }
@@ -108,23 +120,6 @@ class InputFile
     public function setUpdatedAt(?\DateTimeInterface $updated_at): static
     {
         $this->updated_at = $updated_at;
-
-        return $this;
-    }
-
-    public function getImage(): ?Image
-    {
-        return $this->image;
-    }
-
-    public function setImage(Image $image): static
-    {
-        // set the owning side of the relation if necessary
-        if ($image->getInputFileId() !== $this) {
-            $image->setInputFileId($this);
-        }
-
-        $this->image = $image;
 
         return $this;
     }

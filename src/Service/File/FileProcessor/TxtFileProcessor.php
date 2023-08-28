@@ -16,27 +16,20 @@ class TxtFileProcessor extends FileProcessorAbstract
             throw new \Exception('Input File cannot be opened.');
         }
 
-        $invalidLines = [];
         $urls = [];
         while (!feof($f)) {
-            $line = fgets($f);
-            if(preg_match('^(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png)^', $line)) {
-                $urls[] = $line;
-            } else {
-                $invalidLines[] = $line;
-            }
+            $urls[] = fgets($f);
         }
 
-
-        print_r(['validUrls', $urls]);
-        print_r(['invalidStrings', $invalidLines]);
+        if (!$urls) {
+            throw new \Exception('Input File is empty.');
+        }
 
         fclose($f);
 
         return [
-            'count' => (count($urls) + count($invalidLines)),
-            'validUrls' => $urls,
-            'invalidUrls' => $invalidLines
+            'count' => (count($urls)),
+            'urls' => $urls
         ];
     }
 }

@@ -3,23 +3,22 @@ namespace App\Service\Image;
 
 use App\Service\File\FileService;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpFoundation\UrlHelper;
 
 class ImageDownloaderService
-{
-    protected const IMG_URL_REGEX = '/^(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png)/';
-    
-    public function __construct(protected FileService $fileService)
+{   
+    public function __construct(protected ImageProcessor $imageProcessor)
     {   
 
     }
 
-    public function getImages(\SplFileInfo $file, string $destDir)
+    public function getImages(\SplFileInfo $file, string $destDir, OutputInterface $output)
     {
         try {
             $splFile = new \SplFileInfo($file);
-            $fileData = $this->fileService->processFile($splFile, $destDir);
-            
+           
+            return $this->imageProcessor->process($splFile, $destDir, $output);   
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }

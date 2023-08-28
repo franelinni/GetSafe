@@ -45,25 +45,39 @@ class GetImagesCommand extends Command
             $io->warning('No Input file is provided. Please, specify file name with urls list');
         }
 
-        $io->info(sprintf('You\'re about to download images from the file: %s', $inputFile));
+        $io->text(sprintf('You\'re about to download images from the file: <info>%s</info>', $inputFile));
         if (!$destinationDir) {
             $io->warning('No Destination is provided. Default <code>data/storage</code> will be used.');
         } else {
-            $io->info(sprintf('Downloaded files will be saved into %s', $destinationDir));
+            $io->text(sprintf('Downloaded files will be saved into <info>%s</info>', $destinationDir));
         }
-
+        
         try {
+            $io->newLine(2);
+            $io->section('Download has started');
             $file = new \SplFileInfo($inputFile);
-            if (!$this->imageDownloaderService->getImages($file, $destinationDir) ) {
-                $io->success(sprintf('Images from file %s have been successfully downloaded', $inputFile));
-            };
+            $result = $this->imageDownloaderService->getImages($file, $destinationDir, $output);
             
         } catch (\Exception $e) {
-            
-            $io->error('<error>Error: ' . $e->getMessage() . '</error>');
+            $io->section('Error:');
+            $io->error(['<error>' . $e->getMessage() . '</error>', $e->getTraceAsString()]);
             return Command::FAILURE;
         }
 
+        $io->newLine(2);
+        $io->section('Download has completed');
+        $io->table([
+            'Total Lines in the file', 
+            'Total downloaded images', 
+            '# of Errors'
+        ], 
+        [
+            [
+                $result['totalLines'], 
+                $result['totalDownloads'], 
+                $result['errors']
+            ]
+        ]);
         return Command::SUCCESS;
     }
 }
