@@ -2,7 +2,6 @@
 namespace App\Service\File;
 
 use App\Entity\InputFile;
-use App\Service\File\FileProcessor\FileProcessorContext;
 use App\Service\File\FileProcessor\FileProcessorInterface;
 use App\Service\File\FileProcessor\TxtFileProcessor;
 use App\Service\File\FileProcessor\CsvFileProcessor;
@@ -28,15 +27,13 @@ class FileService
        
     }
 
-    public function processFile(\SplFileInfo $inputFile): InputFile
+    public function processFile(\SplFileInfo $inputFile): ?InputFile
     {
        try {
             $this->currentFile = $inputFile;
             $fileProcessor = $this->getFileProcessor();
-            $fileProcessorContext = new FileProcessorContext($fileProcessor);
             
-            $this->fileContent = $fileProcessorContext->processFile($inputFile);
-
+            $this->fileContent = $fileProcessor->readFile($inputFile);
             $inputFile = $this->saveFileMeta($inputFile, $this->fileContent['count']);
             
             return $inputFile;
@@ -46,24 +43,22 @@ class FileService
         }
     }
 
-    public function getFileContents(): array | null 
+    public function getFileContents(): ?array
     {
         return $this->fileContent ?: null;
     }
 
-    private function getFileExtension(): String|null
+    private function getFileExtension(): ?String
     {
         $ext = $this->currentFile->getExtension();
         return in_array($ext, $this->allowedExtensions) ? $ext : null;
     }
 
     /**
-     * Summary of getFileProcessor
-     * 
      * @throws \Exception
      * @return FileProcessorInterface
      */
-    private function getFileProcessor(): FileProcessorInterface
+    private function getFileProcessor(): FileProcessorInterface | \Exception
     {
         if (!$ext = $this->getFileExtension()) {
             return new \Exception('File extension is not allowed.');
@@ -94,5 +89,14 @@ class FileService
         $this->entityManager->flush();
 
         return $inputFile;
+    }
+
+    public function getFileUrls (string $inputFileName): array
+    {
+        $sourceFile = new \SplFileInfo($inputFileName);
+        $inputFile = $this->processFile($sourceFile);
+        $fileContent = $this->getFileContents();
+
+        return $fileContent['urls'];
     }
 }

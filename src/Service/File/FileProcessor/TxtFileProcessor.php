@@ -10,10 +10,14 @@ class TxtFileProcessor extends FileProcessorAbstract
      */
     public function readFile(\SplFileInfo $file): array 
     {
+        if (!file_exists($file->getPathname())) {
+            throw new \Exception(sprintf('Input File %s doesn\'t exist.', $file->getPathname()));
+        }
+
         $f = fopen($file->getPathname(), 'r');
 
         if (!$f) {
-            throw new \Exception('Input File cannot be opened.');
+            throw new \Exception(sprintf('Input File %s cannot be opened.', $file->getPathname()));
         }
 
         $urls = [];
@@ -22,7 +26,7 @@ class TxtFileProcessor extends FileProcessorAbstract
         }
 
         if (!$urls) {
-            throw new \Exception('Input File is empty.');
+            throw new \Exception(sprintf('Input File %s is empty.', $file->getPathname()));
         }
 
         fclose($f);

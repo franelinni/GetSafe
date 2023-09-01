@@ -29,9 +29,8 @@ services:
                 csv: '@App\Service\File\FileProcessor\CsvFileProcessor'
             #$entityManager: '@Doctrine\ORM\EntityManager'
 
-    App\Service\Image\ImageDownloaderService:
+    App\Service\Image\ImageService:
         arguments:
-            $imageProcessor: '@App\Service\Image\ImageProcessor'
     
     App\Service\Image\ImageProcessor:
         arguments:

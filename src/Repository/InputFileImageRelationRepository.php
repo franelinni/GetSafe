@@ -20,29 +20,4 @@ class InputFileImageRelationRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, InputFileImageRelation::class);
     }
-
-//    /**
-//     * @return InputFileImageRelation[] Returns an array of InputFileImageRelation objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('i')
-//            ->andWhere('i.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('i.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?InputFileImageRelation
-//    {
-//        return $this->createQueryBuilder('i')
-//            ->andWhere('i.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

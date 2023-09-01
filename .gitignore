@@ -8,3 +8,11 @@
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
+/tests/coverage
+/data/
+###> phpunit/phpunit ###
+/phpunit.xml
+/phpunit.xml.dist
+.phpunit.result.cache
+###< phpunit/phpunit ###
+.DS_Store
